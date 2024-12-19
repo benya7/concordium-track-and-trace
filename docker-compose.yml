@@ -1,5 +1,3 @@
-version: '3.8'
-
 # This docker compose setup expects the following environment variables to be present:
 #  - `TRACK_AND_TRACE_CONTRACT_ADDRESS`: The address of the track and trace contract instance. (Format: '<1234,0>')
 #  - `TRACK_AND_TRACE_PRIVATE_KEY_FILE`: A path to the account keys used to sponsor the transactions. (For example './private-keys/my-account.export')
@@ -11,8 +9,7 @@ version: '3.8'
 services:
   sponsored-transaction-service:
     build:
-      context: ../
-      dockerfile: ./trackAndTrace/dockerfiles/sponsored-transaction-service.Dockerfile
+      dockerfile: ./dockerfiles/sponsored-transaction-service.Dockerfile
     restart: always
     ports:
       - 8000:8000
@@ -21,18 +18,19 @@ services:
     environment:
       CCD_SPONSORED_TRANSACTION_SERVICE_ALLOWED_ACCOUNTS: Any # This should ideally be limited to avoid draining the sponsor account funds.
       CCD_SPONSORED_TRANSACTION_SERVICE_ALLOWED_CONTRACTS: ${TRACK_AND_TRACE_CONTRACT_ADDRESS:?Please specify the Track and Trace contract instance address (format <1234,0>)}
-      CCD_SPONSORED_TRANSACTION_SERVICE_PRIVATE_KEY_FILE: /private-keys/sponsor-account.export
+      CCD_SPONSORED_TRANSACTION_SERVICE_PRIVATE_KEY_FILE: ./private-keys/sponsor-account.export
       CCD_SPONSORED_TRANSACTION_SERVICE_LISTEN_ADDRESS: 0.0.0.0:8000
       CCD_SPONSORED_TRANSACTION_SERVICE_NODE: ${TRACK_AND_TRACE_NODE:-https://grpc.testnet.concordium.com:20000}
 
   server:
     build:
-      context: ../
-      dockerfile: ./trackAndTrace/dockerfiles/server.Dockerfile
+      dockerfile: ./dockerfiles/server.Dockerfile
     restart: always
     environment:
       CCD_SERVER_DB_CONNECTION: "host=postgres dbname=indexer user=postgres password=password port=5432"
       CCD_SERVER_CONTRACT_ADDRESS: ${TRACK_AND_TRACE_CONTRACT_ADDRESS:?Please specify the Track and Trace contract instance address (format <1234,0>)}
+      CCD_SERVER_PINATA_JWT: ${TRACK_AND_TRACE_PINATA_JWT:?Please specify the Pinata JWT for IPFS uploads}
+      CCD_SERVER_PINATA_GATEWAY: ${TRACK_AND_TRACE_PINATA_GATEWAY:?Please specify the Pinata Gateway URL for IPFS access}
       CCD_SERVER_SPONSORED_TRANSACTION_BACKEND: "http://localhost:8000"
       CCD_SERVER_NETWORK: ${TRACK_AND_TRACE_NETWORK:-testnet}
       CCD_SERVER_NODE: ${TRACK_AND_TRACE_NODE:-https://grpc.testnet.concordium.com:20000}
@@ -44,8 +42,7 @@ services:
 
   indexer:
     build:
-      context: ../
-      dockerfile: ./trackAndTrace/dockerfiles/indexer.Dockerfile
+      dockerfile: ./dockerfiles/indexer.Dockerfile
     restart: always
     environment:
       CCD_INDEXER_CONTRACT: ${TRACK_AND_TRACE_CONTRACT_ADDRESS:?Please specify the Track and Trace contract instance address (format <1234,0>)}
