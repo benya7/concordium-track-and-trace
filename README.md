@@ -2,7 +2,7 @@
 
 ## Hosted front end
 
-[Hosted front end link](https://trackntrace.testnet.concordium.com/)
+[Hosted front end link](http://13.36.39.166:8080/)
 
 ## Overview
 
@@ -27,17 +27,20 @@ For this to work, you should do the following:
 
 1. Deploy and initialize your version of the Track and Trace smart contract.
 2. [Export your account keys from the Browser Wallet](https://developer.concordium.software/en/mainnet/net/guides/export-key.html) and generate a `./private-keys` folder to save the key file into it.
-3. Set the following environment variables:
+3. Create an account on (Pinata Cloud)[https://pinata.cloud] and get your JWT and custom gateway URL.
+4. Set the following environment variables:
    - Set the `TRACK_AND_TRACE_CONTRACT_ADDRESS` variable to the contract address of your contract instance.
    - Set the `TRACK_AND_TRACE_PRIVATE_KEY_FILE` variable to the path of your keys from step 2.
+   - Set the `TRACK_AND_TRACE_PINATA_JWT=` variable to the JSON Web Token from the step 3.
+   - Set the `TRACK_AND_TRACE_PINATA_GATEWAY=` variable to the URL Pinata gateway from the step 3.
    - (Optional) Set the `TRACK_AND_TRACE_NETWORK` variable to the correct net (testnet/mainnet). Defaults to testnet.
    - (Optional) Set the `TRACK_AND_TRACE_NODE` to the gRPC endpoint of the node you want to use. Make sure it runs on the right net, i.e., testnet or mainnet. Defaults to `https://grpc.testnet.concordium.com:20000`.
-4. Run `docker-compose up` to build and start all the services.
+5. Run `docker-compose up` to build and start all the services.
 
 e.g.
 
 ```bash
-TRACK_AND_TRACE_CONTRACT_ADDRESS="<8901,0>" TRACK_AND_TRACE_PRIVATE_KEY_FILE="./private-keys/4SizPU2ipqQQza9Xa6fUkQBCDjyd1vTNUNDGbBeiRGpaJQc6qX.export" docker-compose up
+TRACK_AND_TRACE_CONTRACT_ADDRESS="<10382,0>" TRACK_AND_TRACE_PINATA_JWT="eyJhbGciOi.." TRACK_AND_TRACE_PINATA_GATEWAY=white-imaginative-squid-95.mypinata.cloud TRACK_AND_TRACE_PRIVATE_KEY_FILE="./private-keys/4SizPU2ipqQQza9Xa6fUkQBCDjyd1vTNUNDGbBeiRGpaJQc6qX.export" docker-compose up
 ```
 
 You might need to run the above command twice, if the postgres database container is too slow
