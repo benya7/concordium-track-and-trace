@@ -104,7 +104,12 @@ function LocationMarker({
     const map = useMapEvents({
         click(e) {
             map.locate();
-            setLocation({ coordinates: { latitude: e.latlng.lat.toString(), longitude: e.latlng.lng.toString() } });
+            setLocation({
+                coordinates: {
+                    latitude: e.latlng.lat.toString(),
+                    longitude: e.latlng.lng.toString(),
+                },
+            });
         },
     });
 

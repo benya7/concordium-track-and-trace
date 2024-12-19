@@ -24,11 +24,14 @@ export function InputImageFile({ onChange }: Props) {
     };
 
     const onClear = () => {
-        onChange([])
-        setImageNames([])
+        onChange([]);
+        setImageNames([]);
     };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const onDropRejected = (fileRejections: FileRejection[], _event: DropEvent) => {
+    const onDropRejected = (
+        fileRejections: FileRejection[],
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _event: DropEvent,
+    ) => {
         if (fileRejections.length > 1) {
             setError('Max 1 image file is allowed. Try again.');
         } else if (

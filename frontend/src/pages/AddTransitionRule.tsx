@@ -164,7 +164,10 @@ export function AddTransitionRule(props: Props) {
                             <FormField
                                 control={form.control}
                                 name="address"
-                                rules={{ required: 'Address is required', validate: validateAccountAddress }}
+                                rules={{
+                                    required: 'Address is required',
+                                    validate: validateAccountAddress,
+                                }}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Address</FormLabel>
@@ -178,7 +181,9 @@ export function AddTransitionRule(props: Props) {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" className="min-w-24">Submit</Button>
+                            <Button type="submit" className="min-w-24">
+                                Submit
+                            </Button>
                         </form>
                     </Form>
                 </CardContent>

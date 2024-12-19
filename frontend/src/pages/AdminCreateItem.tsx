@@ -46,7 +46,10 @@ export function AdminCreateItem(props: Props) {
         location: string;
         productImages: File[];
     }
-    const form = useForm<FormType>({ mode: 'all', defaultValues: { url: '', location: '', productImages: [] } });
+    const form = useForm<FormType>({
+        mode: 'all',
+        defaultValues: { url: '', location: '', productImages: [] },
+    });
 
     const [txHash, setTxHash] = useState<string | undefined>(undefined);
     const [error, setError] = useState<string | undefined>(undefined);

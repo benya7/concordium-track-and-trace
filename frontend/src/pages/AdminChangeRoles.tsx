@@ -51,7 +51,9 @@ export function AdminChangeRoles(props: Props) {
     const [currentAdmins, setCurrentAdmins] = useState<ReturnValueGetAddressesByRole | undefined>();
 
     useEffect(() => {
-        const parameter: TrackAndTraceContract.GetAddressesByRoleParameter = { type: 'Admin' };
+        const parameter: TrackAndTraceContract.GetAddressesByRoleParameter = {
+            type: 'Admin',
+        };
         getAddressesByRole(parameter)
             .then((result) => {
                 setCurrentAdmins(result);
@@ -89,7 +91,10 @@ export function AdminChangeRoles(props: Props) {
         }
 
         const parameter: TrackAndTraceContract.RevokeRoleParameter = {
-            address: { type: 'Account', content: AccountAddress.fromBase58(values.address) },
+            address: {
+                type: 'Account',
+                content: AccountAddress.fromBase58(values.address),
+            },
             role: { type: 'Admin' },
         };
 
@@ -118,7 +123,10 @@ export function AdminChangeRoles(props: Props) {
                             <FormField
                                 control={form.control}
                                 name="address"
-                                rules={{ required: 'Address is required', validate: validateAccountAddress }}
+                                rules={{
+                                    required: 'Address is required',
+                                    validate: validateAccountAddress,
+                                }}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Address</FormLabel>
@@ -132,7 +140,9 @@ export function AdminChangeRoles(props: Props) {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" className='min-w-24'>Add</Button>
+                            <Button type="submit" className="min-w-24">
+                                Add
+                            </Button>
                         </form>
                     </Form>
                 </CardContent>
