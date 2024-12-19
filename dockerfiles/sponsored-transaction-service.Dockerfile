@@ -4,7 +4,7 @@ ARG RUST_IMAGE=rust:1.74-bookworm
 
 # Build service
 FROM ${RUST_IMAGE} as build
-COPY ./trackAndTrace/sponsored-transaction-service ./
+COPY ./sponsored-transaction-service ./
 RUN cargo build --release
 
 FROM debian:bookworm
