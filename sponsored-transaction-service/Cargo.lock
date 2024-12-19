@@ -712,6 +712,7 @@ checksum = "acbf1af155f9b9ef647e42cdc158db4b64a1b61f743629225fde6f3e0be2a7c7"
 [[package]]
 name = "concordium-contracts-common"
 version = "9.2.0"
+source = "git+https://github.com/Concordium/concordium-rust-sdk.git#61678e6670708b785922dd34fa0fcced465bc5ef"
 dependencies = [
  "base64",
  "bs58",
@@ -732,6 +733,7 @@ dependencies = [
 [[package]]
 name = "concordium-contracts-common-derive"
 version = "4.1.0"
+source = "git+https://github.com/Concordium/concordium-rust-sdk.git#61678e6670708b785922dd34fa0fcced465bc5ef"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -741,6 +743,7 @@ dependencies = [
 [[package]]
 name = "concordium-rust-sdk"
 version = "5.0.0"
+source = "git+https://github.com/Concordium/concordium-rust-sdk.git#61678e6670708b785922dd34fa0fcced465bc5ef"
 dependencies = [
  "aes-gcm",
  "anyhow",
@@ -772,6 +775,7 @@ dependencies = [
 [[package]]
 name = "concordium-smart-contract-engine"
 version = "6.0.0"
+source = "git+https://github.com/Concordium/concordium-rust-sdk.git#61678e6670708b785922dd34fa0fcced465bc5ef"
 dependencies = [
  "anyhow",
  "byteorder",
@@ -795,6 +799,7 @@ dependencies = [
 [[package]]
 name = "concordium-wasm"
 version = "5.0.0"
+source = "git+https://github.com/Concordium/concordium-rust-sdk.git#61678e6670708b785922dd34fa0fcced465bc5ef"
 dependencies = [
  "anyhow",
  "concordium-contracts-common",
@@ -806,6 +811,7 @@ dependencies = [
 [[package]]
 name = "concordium_base"
 version = "6.0.0"
+source = "git+https://github.com/Concordium/concordium-rust-sdk.git#61678e6670708b785922dd34fa0fcced465bc5ef"
 dependencies = [
  "aes",
  "anyhow",
@@ -852,6 +858,7 @@ dependencies = [
 [[package]]
 name = "concordium_base_derive"
 version = "1.0.0"
+source = "git+https://github.com/Concordium/concordium-rust-sdk.git#61678e6670708b785922dd34fa0fcced465bc5ef"
 dependencies = [
  "proc-macro2",
  "quote",
