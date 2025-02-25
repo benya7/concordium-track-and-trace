@@ -195,7 +195,6 @@ export function AdminCreateItem(props: Props) {
                             <FormField
                                 control={form.control}
                                 name="url"
-                                rules={{ required: 'URL is required' }}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>URL</FormLabel>
