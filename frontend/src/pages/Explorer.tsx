@@ -14,6 +14,7 @@ import { LatLngExpression } from 'leaflet';
 import { PinataSDK } from 'pinata';
 import { getItemState } from '@/track_and_trace_contract';
 import { useAlertMsg } from '@/hooks/use-alert-msg';
+import { Spinner } from '@/components/ui/spinner';
 
 interface Props {
     pinata: PinataSDK;
@@ -30,11 +31,12 @@ export function Explorer(props: Props) {
         defaultValues: { itemID: '' },
     });
 
-    const {message, setMessage} = useAlertMsg();
+    const { message, setMessage } = useAlertMsg();
     const [itemChanged, setItemChanged] = useState<ChangeItem[] | undefined>(undefined);
     const [itemCreated, setItemCreated] = useState<CreateItem | undefined>(undefined);
 
     const [productImageUrl, setProductImageUrl] = useState<string | undefined>(undefined);
+    const [loadingImageUrl, setLoadingImageUrl] = useState(false);
     const tracePath = useMemo<LatLngExpression[] | undefined>(() => {
         if (!itemCreated) {
             return;
@@ -83,10 +85,17 @@ export function Explorer(props: Props) {
             if (itemState.metadata_url.type === 'Some') {
                 const metadata = await getPinataData(itemState.metadata_url.content.url, pinata);
                 if (metadata && !(metadata instanceof Blob) && metadata.imageUrl) {
-                    const imageData = await getPinataData(metadata.imageUrl as string, pinata);
-                    if (imageData instanceof Blob) {
-                        const blobUrl = URL.createObjectURL(imageData);
-                        setProductImageUrl(blobUrl);
+                    setLoadingImageUrl(true);
+                    try {
+                        const imageData = await getPinataData(metadata.imageUrl as string, pinata);
+                        if (imageData instanceof Blob) {
+                            const blobUrl = URL.createObjectURL(imageData);
+                            setProductImageUrl(blobUrl);
+                        }
+                    } catch (error) {
+                        console.log('error to get image signed url')
+                    } finally {
+                        setLoadingImageUrl(false);
                     }
                 }
             }
@@ -142,7 +151,7 @@ export function Explorer(props: Props) {
                             />
                         ) : (
                             <div className="h-full flex items-center justify-center">
-                                <p className="text-[0.8rem] text-muted-foreground">No product images avalaible.</p>
+                                {loadingImageUrl ? <Spinner show={loadingImageUrl} /> : <p className="text-[0.8rem] text-muted-foreground">No product images avalaible.</p>}
                             </div>
                         )}
                     </div>
