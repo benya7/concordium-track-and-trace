@@ -1,69 +1,69 @@
 [
     {
-        "authorized_account": "4bbdAUCDK2D6cUvUeprGr4FaSaHXKuYmYVjyCa4bXSCu3NUXzA",
+        "authorized_account": "4Ry2Dh3LA3LLYToNGYDg8zYbcAWEfzXPshqyUv1Zstos6GXdzj",
         "from": {
-            "Produced": null
+            "Produced": []
         },
         "to": [
             {
-                "InTransit": null
+                "InTransit": []
             },
             {
-                "InStore": null
+                "InStore": []
             },
             {
-                "Sold": null
+                "Sold": []
             }
         ]
     },
     {
-        "authorized_account": "4bbdAUCDK2D6cUvUeprGr4FaSaHXKuYmYVjyCa4bXSCu3NUXzA",
+        "authorized_account": "4Ry2Dh3LA3LLYToNGYDg8zYbcAWEfzXPshqyUv1Zstos6GXdzj",
         "from": {
-            "InTransit": null
+            "InTransit": []
         },
         "to": [
             {
-                "Produced": null
+                "Produced": []
             },
             {
-                "InStore": null
+                "InStore": []
             },
             {
-                "Sold": null
+                "Sold": []
             }
         ]
     },
     {
-        "authorized_account": "4bbdAUCDK2D6cUvUeprGr4FaSaHXKuYmYVjyCa4bXSCu3NUXzA",
+        "authorized_account": "4Ry2Dh3LA3LLYToNGYDg8zYbcAWEfzXPshqyUv1Zstos6GXdzj",
         "from": {
-            "InStore": null
+            "InStore": []
         },
         "to": [
             {
-                "Produced": null
+                "Produced": []
             },
             {
-                "InTransit": null
+                "InTransit": []
             },
             {
-                "Sold": null
+                "Sold": []
             }
         ]
     },
     {
-        "authorized_account": "4bbdAUCDK2D6cUvUeprGr4FaSaHXKuYmYVjyCa4bXSCu3NUXzA",
+        "authorized_account": "4Ry2Dh3LA3LLYToNGYDg8zYbcAWEfzXPshqyUv1Zstos6GXdzj",
         "from": {
-            "Sold": null
+            "Sold": []
         },
         "to": [
             {
-                "Produced": null
+                "Produced": []
             },
             {
-                "InTransit": null
+                "InTransit": []
             },
             {
-                "InStore": null
+                "InStore": []
             }
         ]
     }
