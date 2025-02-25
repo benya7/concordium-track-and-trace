@@ -73,7 +73,9 @@ export function InputImageFile({ onChange }: Props) {
                 <Input {...getInputProps()} />
                 <div className="text-center border my-2 py-8 rounded-md cursor-pointer text-[0.8rem] text-muted-foreground">
                     {imageNames && imageNames.length > 0 ? (
-                        imageNames.map((imageName, i) => <p key={i}>{imageName}</p>)
+                        imageNames.map((imageName, i) => <p key={i}>{imageName.length > 16
+                            ? `${imageName.slice(0, 8)}...${imageName.slice(-8)}`
+                            : imageName}</p>)
                     ) : (
                         <p>Drag and drop a picture, or click to select</p>
                     )}
