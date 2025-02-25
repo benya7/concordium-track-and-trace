@@ -13,6 +13,7 @@ import { MapContainer, TileLayer, CircleMarker, Popup, Polyline, Circle } from '
 import { LatLngExpression } from 'leaflet';
 import { PinataSDK } from 'pinata';
 import { getItemState } from '@/track_and_trace_contract';
+import { useAlertMsg } from '@/hooks/use-alert-msg';
 
 interface Props {
     pinata: PinataSDK;
@@ -29,8 +30,7 @@ export function Explorer(props: Props) {
         defaultValues: { itemID: '' },
     });
 
-    const [error, setError] = useState<string | undefined>(undefined);
-
+    const {message, setMessage} = useAlertMsg();
     const [itemChanged, setItemChanged] = useState<ChangeItem[] | undefined>(undefined);
     const [itemCreated, setItemCreated] = useState<CreateItem | undefined>(undefined);
 
@@ -66,12 +66,12 @@ export function Explorer(props: Props) {
     }, [itemChanged, itemCreated]);
 
     async function onSubmit(values: FormType) {
-        setError(undefined);
+        setMessage(undefined);
         setItemChanged(undefined);
         setItemCreated(undefined);
 
         if (values.itemID === '') {
-            setError(`'itemID' input field is undefined`);
+            setMessage(`'itemID' input field is undefined`);
             throw Error(`'itemID' input field is undefined`);
         }
         try {
@@ -91,7 +91,7 @@ export function Explorer(props: Props) {
                 }
             }
         } catch (error) {
-            setError(`Couldn't get data from database. Orginal error: ${(error as Error).message}`);
+            setMessage(`Couldn't get data from database. Orginal error: ${(error as Error).message}`);
         }
     }
 
@@ -129,7 +129,7 @@ export function Explorer(props: Props) {
                     </Form>
                 </CardContent>
             </Card>
-            <div className="fixed bottom-4">{error && <Alert destructive title="Error" description={error} />}</div>
+            <div className="fixed bottom-4">{message && <Alert destructive title="Error" description={message} />}</div>
             {itemChanged !== undefined && itemCreated !== undefined && (
                 <div className="grid md:grid-cols-2 gap-1 w-full max-w-2xl p-2 border rounded-lg">
                     <div className="relative border rounded-lg">

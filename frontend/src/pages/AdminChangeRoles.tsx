@@ -26,6 +26,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { useAlertMsg } from '@/hooks/use-alert-msg';
 
 interface Props {
     connection: WalletConnection | undefined;
@@ -46,8 +47,8 @@ export function AdminChangeRoles(props: Props) {
         },
     });
 
-    const [txHash, setTxHash] = useState<string | undefined>(undefined);
-    const [error, setError] = useState<string | undefined>(undefined);
+    const {message: txHash, setMessage: setTxHash} = useAlertMsg(12000);
+    const {message: errorMessage, setMessage: setErrorMessage} = useAlertMsg();
     const [currentAdmins, setCurrentAdmins] = useState<ReturnValueGetAddressesByRole | undefined>();
 
     useEffect(() => {
@@ -59,7 +60,7 @@ export function AdminChangeRoles(props: Props) {
                 setCurrentAdmins(result);
             })
             .catch((e) => {
-                setError((e as Error).message);
+                setErrorMessage((e as Error).message);
             });
     }, []);
 
@@ -76,17 +77,17 @@ export function AdminChangeRoles(props: Props) {
                     setTxHash(txHash);
                 })
                 .catch((e) => {
-                    setError((e as Error).message);
+                    setErrorMessage((e as Error).message);
                 });
         } else {
-            setError(`Wallet is not connected. Click 'Connect Wallet' button.`);
+            setErrorMessage(`Wallet is not connected. Click 'Connect Wallet' button.`);
         }
     }
     function onSubmit(values: FormType) {
-        setError(undefined);
+        setErrorMessage(undefined);
 
         if (values.address === '') {
-            setError(`'address' input field is undefined`);
+            setErrorMessage(`'address' input field is undefined`);
             throw Error(`'address' input field is undefined`);
         }
 
@@ -105,10 +106,10 @@ export function AdminChangeRoles(props: Props) {
                     setTxHash(txHash);
                 })
                 .catch((e) => {
-                    setError((e as Error).message);
+                    setErrorMessage((e as Error).message);
                 });
         } else {
-            setError(`Wallet is not connected. Click 'Connect Wallet' button.`);
+            setErrorMessage(`Wallet is not connected. Click 'Connect Wallet' button.`);
         }
     }
     return (
@@ -197,7 +198,7 @@ export function AdminChangeRoles(props: Props) {
                 </TableBody>
             </Table>
             <div className="fixed bottom-4">
-                {error && <Alert destructive title="Error" description={error} />}
+                {errorMessage && <Alert destructive title="Error" description={errorMessage} />}
                 {activeConnectorError && (
                     <Alert
                         destructive

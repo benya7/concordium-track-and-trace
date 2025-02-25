@@ -15,6 +15,7 @@ import { Alert } from '@/components/Alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAlertMsg } from '@/hooks/use-alert-msg';
 interface Props {
     connection: WalletConnection | undefined;
     accountAddress: string | undefined;
@@ -47,24 +48,24 @@ export function AddTransitionRule(props: Props) {
         },
     });
 
-    const [txHash, setTxHash] = useState<string | undefined>(undefined);
-    const [error, setError] = useState<string | undefined>(undefined);
+    const {message: txHash, setMessage: setTxHash} = useAlertMsg(12000);
+    const {message: errorMessage, setMessage: setErrorMessage} = useAlertMsg();
 
     function onSubmit(values: FormType) {
-        setError(undefined);
+        setErrorMessage(undefined);
 
         if (values.address === '') {
-            setError(`'address' input field is undefined`);
+            setErrorMessage(`'address' input field is undefined`);
             throw Error(`'address' input field is undefined`);
         }
 
         // if (fromStatus === undefined) {
-        //     setError(`'from_status' input field is undefined`);
+        //     setErrorMessage(`'from_status' input field is undefined`);
         //     throw Error(`'from_status' input field is undefined`);
         // }
 
         // if (toStatus === undefined) {
-        //     setError(`'to_status' input field is undefined`);
+        //     setErrorMessage(`'to_status' input field is undefined`);
         //     throw Error(`'to_status' input field is undefined`);
         // }
 
@@ -82,10 +83,10 @@ export function AddTransitionRule(props: Props) {
                     setTxHash(txHash);
                 })
                 .catch((e) => {
-                    setError((e as Error).message);
+                    setErrorMessage((e as Error).message);
                 });
         } else {
-            setError(`Wallet is not connected. Click 'Connect Wallet' button.`);
+            setErrorMessage(`Wallet is not connected. Click 'Connect Wallet' button.`);
         }
     }
 
@@ -189,7 +190,7 @@ export function AddTransitionRule(props: Props) {
                 </CardContent>
             </Card>
             <div className="fixed bottom-4">
-                {error && <Alert destructive title="Error" description={error} />}
+                {errorMessage && <Alert destructive title="Error" description={errorMessage} />}
                 {activeConnectorError && (
                     <Alert
                         destructive

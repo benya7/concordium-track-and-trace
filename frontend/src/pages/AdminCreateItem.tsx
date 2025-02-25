@@ -26,6 +26,7 @@ import { LocationPicker } from '@/components/LocationPicker';
 import { LocationDetector } from '@/components/LocationDetector';
 import { PinataSDK } from 'pinata';
 import { Loader2 } from 'lucide-react';
+import { useAlertMsg } from '@/hooks/use-alert-msg';
 
 interface Props {
     connection: WalletConnection | undefined;
@@ -50,9 +51,9 @@ export function AdminCreateItem(props: Props) {
         mode: 'all',
         defaultValues: { url: '', location: '', productImages: [] },
     });
-
-    const [txHash, setTxHash] = useState<string | undefined>(undefined);
-    const [error, setError] = useState<string | undefined>(undefined);
+;
+    const {message: txHash, setMessage: setTxHash} = useAlertMsg(12000);
+    const {message: errorMessage, setMessage: setErrorMessage} = useAlertMsg();
     const [isLoading, setIsLoading] = useState(false);
     const [newItemId, setNewItemId] = useState<number | bigint | undefined>(undefined);
     const grpcClient = useGrpcClient(constants.NETWORK);
@@ -81,13 +82,13 @@ export function AdminCreateItem(props: Props) {
                         const itemId: bigint = FromTokenIdU64(itemCreatedEvent.item_id);
                         setNewItemId(itemId);
                     } else {
-                        setError('Tansaction failed and event decoding failed.');
+                        setErrorMessage('Tansaction failed and event decoding failed.');
                     }
                     setIsLoading(false);
                 })
                 .catch((e) => {
                     setNewItemId(undefined);
-                    setError((e as Error).message);
+                    setErrorMessage((e as Error).message);
                     setIsLoading(false);
                 });
         }
@@ -96,7 +97,7 @@ export function AdminCreateItem(props: Props) {
     function onDetectLocation() {
         getLocation(
             (location) => form.setValue('location', `${location.latitude},${location.longitude}`),
-            (error) => setError(error),
+            (error) => setErrorMessage(error),
         );
     }
 
@@ -105,7 +106,7 @@ export function AdminCreateItem(props: Props) {
     }
 
     async function onSubmit(values: FormType) {
-        setError(undefined);
+        setErrorMessage(undefined);
         if (accountAddress && connection) {
             setIsLoading(true);
 
@@ -117,7 +118,7 @@ export function AdminCreateItem(props: Props) {
                 try {
                     metadata = await fetchJson(values.url);
                 } catch (e) {
-                    setError((e as Error).message);
+                    setErrorMessage((e as Error).message);
                     setIsLoading(false);
                     return;
                 }
@@ -137,7 +138,7 @@ export function AdminCreateItem(props: Props) {
                         };
                     }
                 } catch (e) {
-                    setError((e as Error).message);
+                    setErrorMessage((e as Error).message);
                     setIsLoading(false);
                     return;
                 }
@@ -147,7 +148,7 @@ export function AdminCreateItem(props: Props) {
                 try {
                     metadataCid = (await pinata.upload.json(metadata)).cid;
                 } catch (e) {
-                    setError((e as Error).message);
+                    setErrorMessage((e as Error).message);
                     setIsLoading(false);
                     return;
                 }
@@ -175,11 +176,11 @@ export function AdminCreateItem(props: Props) {
                 setTxHash(txHash);
                 form.reset();
             } catch (e) {
-                setError((e as Error).message);
+                setErrorMessage((e as Error).message);
                 setIsLoading(false);
             }
         } else {
-            setError(`Wallet is not connected. Click 'Connect Wallet' button.`);
+            setErrorMessage(`Wallet is not connected. Click 'Connect Wallet' button.`);
         }
     }
 
@@ -234,7 +235,7 @@ export function AdminCreateItem(props: Props) {
                 </CardContent>
             </Card>
             <div className="fixed bottom-4">
-                {error && <Alert destructive title="Error" description={error} />}
+                {errorMessage && <Alert destructive title="Error" description={errorMessage} />}
                 {activeConnectorError && (
                     <Alert
                         destructive

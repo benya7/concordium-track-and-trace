@@ -23,6 +23,7 @@ import { PinataSDK } from 'pinata';
 import { Loader2 } from 'lucide-react';
 import { ItemStatus } from '@/lib/itemEvents';
 import { InputImageFile } from '@/components/InputImageFile';
+import { useAlertMsg } from '@/hooks/use-alert-msg';
 
 interface Props {
     connection: WalletConnection | undefined;
@@ -112,10 +113,10 @@ export function ChangeItemStatus(props: Props) {
         },
     });
 
-    const [txHash, setTxHash] = useState<string | undefined>(undefined);
     const [isLoading, setIsLoading] = useState(false);
+    const {message: txHash, setMessage: setTxHash} = useAlertMsg(12000);
+    const {message: errorMessage, setMessage: setErrorMessage} = useAlertMsg();
 
-    const [error, setError] = useState<string | undefined>(undefined);
     const [nextNonce, setNextNonce] = useState<number | bigint>(0);
 
     const grpcClient = useGrpcClient(constants.NETWORK);
@@ -132,10 +133,9 @@ export function ChangeItemStatus(props: Props) {
                     if (nonceValue !== undefined) {
                         setNextNonce(nonceValue[0]);
                     }
-                    setError(undefined);
                 })
                 .catch((e) => {
-                    setError((e as Error).message);
+                    setErrorMessage((e as Error).message);
                     setNextNonce(0);
                 });
         }
@@ -151,7 +151,7 @@ export function ChangeItemStatus(props: Props) {
     function onDetectLocation() {
         getLocation(
             (location) => form.setValue('newLocation', `${location.latitude},${location.longitude}`),
-            (error) => setError(error),
+            (error) => setErrorMessage(error),
         );
     }
 
@@ -160,10 +160,11 @@ export function ChangeItemStatus(props: Props) {
     }
 
     async function onSubmit(values: FormType) {
-        setError(undefined);
+        setTxHash(undefined);
+        setErrorMessage(undefined);
 
         if (!connection || !accountAddress) {
-            setError(`Wallet is not connected. Click 'Connect Wallet' button.`);
+            setErrorMessage(`Wallet is not connected. Click 'Connect Wallet' button.`);
             return;
         }
 
@@ -198,7 +199,7 @@ export function ChangeItemStatus(props: Props) {
             setTxHash(txHash);
             form.reset();
         } catch (e) {
-            setError((e as Error).message);
+            setErrorMessage((e as Error).message);
         } finally {
             setIsLoading(false);
         }
@@ -348,7 +349,7 @@ export function ChangeItemStatus(props: Props) {
                 </CardContent>
             </Card>
             <div className="fixed bottom-4">
-                {error && <Alert destructive title="Error" description={error} />}
+                {errorMessage && <Alert destructive title="Error" description={errorMessage} />}
                 {activeConnectorError && (
                     <Alert
                         destructive
