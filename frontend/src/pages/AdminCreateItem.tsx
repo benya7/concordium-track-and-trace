@@ -54,8 +54,9 @@ export function AdminCreateItem(props: Props) {
 ;
     const {message: txHash, setMessage: setTxHash} = useAlertMsg(12000);
     const {message: errorMessage, setMessage: setErrorMessage} = useAlertMsg();
+    const {message: newItemId, setMessage: setNewItemId} = useAlertMsg(18000);
+
     const [isLoading, setIsLoading] = useState(false);
-    const [newItemId, setNewItemId] = useState<number | bigint | undefined>(undefined);
     const grpcClient = useGrpcClient(constants.NETWORK);
 
     // Wait until the submitted transaction is finalized.
@@ -80,7 +81,7 @@ export function AdminCreateItem(props: Props) {
                         // E.g. the `TokenIdU64` representation of `1` is the hex string `0100000000000000`.
                         // This function converts the `TokenIdU64` representation into a bigint type here.
                         const itemId: bigint = FromTokenIdU64(itemCreatedEvent.item_id);
-                        setNewItemId(itemId);
+                        setNewItemId(itemId.toString());
                     } else {
                         setErrorMessage('Tansaction failed and event decoding failed.');
                     }
