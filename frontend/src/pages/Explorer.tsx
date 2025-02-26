@@ -30,7 +30,7 @@ export function Explorer(props: Props) {
         mode: 'all',
         defaultValues: { itemID: '' },
     });
-    const itemIDWatch = useWatch({ name: 'itemID'});
+    const itemIDWatch = useWatch({ name: 'itemID', control: form.control});
     const { message, setMessage } = useAlertMsg();
     const [itemChanged, setItemChanged] = useState<ChangeItem[] | undefined>(undefined);
     const [itemCreated, setItemCreated] = useState<CreateItem | undefined>(undefined);
@@ -68,6 +68,7 @@ export function Explorer(props: Props) {
     }, [itemChanged, itemCreated]);
 
     useEffect(() => {
+        console.log("arre")
         setProductImageUrl(undefined);
         setItemChanged(undefined);
         setItemCreated(undefined);
