@@ -72,7 +72,7 @@ export function Explorer(props: Props) {
         setItemChanged(undefined);
         setItemCreated(undefined);
     }, [itemIDWatch])
-    
+
     async function onSubmit(values: FormType) {
         setMessage(undefined);
         setItemChanged(undefined);
@@ -157,7 +157,7 @@ export function Explorer(props: Props) {
                                 crossOrigin="anonymous"
                             />
                         ) : (
-                            <div className="h-full flex items-center justify-center">
+                            <div className="h-full flex items-center justify-center min-h-60">
                                 {loadingImageUrl ? <Spinner show={loadingImageUrl} /> : <p className="text-[0.8rem] text-muted-foreground">No product images avalaible.</p>}
                             </div>
                         )}
