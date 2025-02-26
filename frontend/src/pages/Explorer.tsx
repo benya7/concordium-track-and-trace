@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import * as constants from '@/constants';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -30,7 +30,7 @@ export function Explorer(props: Props) {
         mode: 'all',
         defaultValues: { itemID: '' },
     });
-
+    const itemIDWatch = useWatch({ name: 'itemID'});
     const { message, setMessage } = useAlertMsg();
     const [itemChanged, setItemChanged] = useState<ChangeItem[] | undefined>(undefined);
     const [itemCreated, setItemCreated] = useState<CreateItem | undefined>(undefined);
@@ -67,6 +67,12 @@ export function Explorer(props: Props) {
         return coordinates;
     }, [itemChanged, itemCreated]);
 
+    useEffect(() => {
+        setProductImageUrl(undefined);
+        setItemChanged(undefined);
+        setItemCreated(undefined);
+    }, [itemIDWatch])
+    
     async function onSubmit(values: FormType) {
         setMessage(undefined);
         setItemChanged(undefined);
