@@ -130,6 +130,7 @@ export function Explorer(props: Props) {
                                             <Input
                                                 type="number"
                                                 placeholder="Enter the tracking number ID"
+                                                min={0}
                                                 {...field}
                                             />
                                         </FormControl>
