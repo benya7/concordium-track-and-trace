@@ -209,22 +209,18 @@ export function ChangeItemStatus(props: Props) {
         if (!values.newMetadataUrl) return undefined;
 
         let newMetadata = await fetchJson(values.newMetadataUrl);
-        // if now new product images are provided, fetch imageUrl from item state and if exists add it to new metadata
-        if (values.productImages.length === 0) {
-            const itemState = await getItemState(ToTokenIdU64(Number(values.itemID)));
-            if (itemState.metadata_url.type === 'Some') {
-                const productMetadataJson = await getDataFromIPFS(itemState.metadata_url.content.url, pinata);
-                if (productMetadataJson && productMetadataJson.contentType === 'application/json') {
-                    const productMetadata: {
-                        [key: string]: unknown;
-                        imageUrl?: string;
-                    } = JSON.parse(productMetadataJson.data as string)
-                    if (productMetadata.imageUrl) {
-                        newMetadata = { ...newMetadata, imageUrl: productMetadata.imageUrl };
-                    }
-                }
+        // Check if exists metadata from the item state, if exists merge the objects.
+        const itemState = await getItemState(ToTokenIdU64(Number(values.itemID)));
+        if (itemState.metadata_url.type === "Some") {
+            const productMetadataJson = await getDataFromIPFS(itemState.metadata_url.content.url, pinata);
+            if (productMetadataJson && productMetadataJson.contentType === 'application/json') {
+                const productMetadata = productMetadataJson.data as unknown as {
+                    [key: string]: unknown;
+                };
+                newMetadata = { ...productMetadata, ...newMetadata };
             }
-        } else {
+        }
+        if (values.productImages.length > 0) {
             const productImageCid = (await pinata.upload.file(values.productImages[0])).IpfsHash;
             newMetadata = { ...newMetadata, imageUrl: `ipfs://${productImageCid}` };
         }

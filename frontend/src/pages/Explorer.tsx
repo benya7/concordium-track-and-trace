@@ -91,13 +91,12 @@ export function Explorer(props: Props) {
             if (itemState.metadata_url.type === 'Some') {
                 const productMetadataJson = await getDataFromIPFS(itemState.metadata_url.content.url, pinata);
                 if (productMetadataJson && productMetadataJson.contentType === 'application/json') {
-                    console.log(productMetadataJson.data);
-                    const productMetadata: {
+                    const { imageUrl } = productMetadataJson.data as unknown as {
                         [key: string]: unknown;
                         imageUrl?: string;
-                    } = JSON.parse(productMetadataJson.data as string)
-                    if (productMetadata.imageUrl) {
-                        setProductImageUrl(`https://ipfs.io/ipfs/${productMetadata.imageUrl}`)
+                    }
+                    if (imageUrl) {
+                        setProductImageUrl(`https://ipfs.io/ipfs/${imageUrl}`)
                     }
                 }
             }
