@@ -10,7 +10,7 @@ import { TxHashLink } from '@/components/TxHashLink';
 import * as constants from '@/constants';
 import { getItemState, nonceOf } from '@/track_and_trace_contract';
 import * as TrackAndTraceContract from '../../generated/module_track_and_trace'; // Code generated from a smart contract module. The naming convention of the generated file is `moduleName_smartContractName`.
-import { ToTokenIdU64, getPinataData, fetchJson, getExpiryTime, getLocation, objectToBytes } from '@/lib/utils';
+import { ToTokenIdU64, fetchJson, getExpiryTime, getLocation, objectToBytes, getDataFromIPFS } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,7 +19,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LocationPicker } from '@/components/LocationPicker';
 import { LocationDetector } from '@/components/LocationDetector';
-import { PinataSDK } from 'pinata';
+import { PinataSDK } from 'pinata-web3';
 import { Loader2 } from 'lucide-react';
 import { ItemStatus } from '@/lib/itemEvents';
 import { InputImageFile } from '@/components/InputImageFile';
@@ -209,22 +209,28 @@ export function ChangeItemStatus(props: Props) {
         if (!values.newMetadataUrl) return undefined;
 
         let newMetadata = await fetchJson(values.newMetadataUrl);
-
+        // if now new product images are provided, fetch imageUrl from item state and if exists add it to new metadata
         if (values.productImages.length === 0) {
             const itemState = await getItemState(ToTokenIdU64(Number(values.itemID)));
             if (itemState.metadata_url.type === 'Some') {
-                const currentMetadata = await getPinataData(itemState.metadata_url.content.url, pinata);
-                if (currentMetadata && !(currentMetadata instanceof Blob) && currentMetadata.imageUrl) {
-                    newMetadata = { ...newMetadata, imageUrl: currentMetadata.imageUrl };
+                const productMetadataJson = await getDataFromIPFS(itemState.metadata_url.content.url, pinata);
+                if (productMetadataJson && productMetadataJson.contentType === 'application/json') {
+                    const productMetadata: {
+                        [key: string]: unknown;
+                        imageUrl?: string;
+                    } = JSON.parse(productMetadataJson.data as string)
+                    if (productMetadata.imageUrl) {
+                        newMetadata = { ...newMetadata, imageUrl: productMetadata.imageUrl };
+                    }
                 }
             }
         } else {
-            const imageCid = await pinata.upload.file(values.productImages[0]);
-            newMetadata = { ...newMetadata, imageUrl: `ipfs://${imageCid.cid}` };
+            const productImageCid = (await pinata.upload.file(values.productImages[0])).IpfsHash;
+            newMetadata = { ...newMetadata, imageUrl: `ipfs://${productImageCid}` };
         }
 
-        const metadataCid = await pinata.upload.json(newMetadata);
-        return `ipfs://${metadataCid.cid}`;
+        const productMetadataJsonCid = (await pinata.upload.json(newMetadata)).IpfsHash;
+        return `ipfs://${productMetadataJsonCid}`;
     }
 
     async function submitTransaction(

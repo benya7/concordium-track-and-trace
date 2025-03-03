@@ -2,7 +2,7 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { AccountAddress } from '@concordium/web-sdk';
 import { LatLngExpression } from 'leaflet';
-import { PinataSDK } from 'pinata';
+import { PinataSDK } from 'pinata-web3';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -203,37 +203,14 @@ export function getExpiryTime(days: number): Date {
  * @returns The Pinata data as a JSON object, a Blob (for binary data),
  *          or null if the response is empty.
  */
-export async function getPinataData(
+export async function getDataFromIPFS(
     urlOrCid: string,
     pinata: PinataSDK,
-): Promise<Record<string, unknown> | Blob | null> {
+) {
     const cid = urlOrCid.startsWith('ipfs://') ? urlOrCid.split('//')[1] : urlOrCid;
-
-    const url = await pinata.gateways.createSignedURL({
-        cid,
-        expires: 3600,
-    });
-
-    const response = await fetch('/api/getPinataData', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
-    });
-
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(`Unable to fetch Pinata data: ${JSON.stringify(error)}`);
-    }
-
-    if (response.status === 204 || response.body === null) {
-        return null;
-    }
-
-    const contentType = response.headers.get('content-type') || '';
-
-    if (contentType.includes('application/json')) {
-        return response.json();
-    } else {
-        return response.blob();
+    try {
+        return await pinata.gateways.get(cid);
+    } catch (error) {
+        throw new Error(`Unable to fetch data from CID: ${JSON.stringify(error)}`);
     }
 }

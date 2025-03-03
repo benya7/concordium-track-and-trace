@@ -8,10 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Alert } from '@/components/Alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ChangeItem, CreateItem, getItemCreatedEvent, getItemStatusChangedEvents } from '@/lib/itemEvents';
-import { bytesToObject, getPinataData, parseCoordinates, ToTokenIdU64 } from '@/lib/utils';
+import { bytesToObject, getDataFromIPFS, parseCoordinates, ToTokenIdU64 } from '@/lib/utils';
 import { MapContainer, TileLayer, CircleMarker, Popup, Polyline, Circle } from 'react-leaflet';
 import { LatLngExpression } from 'leaflet';
-import { PinataSDK } from 'pinata';
+import { PinataSDK } from 'pinata-web3';
 import { getItemState } from '@/track_and_trace_contract';
 import { useAlertMsg } from '@/hooks/use-alert-msg';
 import { Spinner } from '@/components/ui/spinner';
@@ -30,7 +30,7 @@ export function Explorer(props: Props) {
         mode: 'all',
         defaultValues: { itemID: '' },
     });
-    const itemIDWatch = useWatch({ name: 'itemID', control: form.control});
+    const itemIDWatch = useWatch({ name: 'itemID', control: form.control });
     const { message, setMessage } = useAlertMsg();
     const [itemChanged, setItemChanged] = useState<ChangeItem[] | undefined>(undefined);
     const [itemCreated, setItemCreated] = useState<CreateItem | undefined>(undefined);
@@ -68,7 +68,6 @@ export function Explorer(props: Props) {
     }, [itemChanged, itemCreated]);
 
     useEffect(() => {
-        console.log("arre")
         setProductImageUrl(undefined);
         setItemChanged(undefined);
         setItemCreated(undefined);
@@ -90,19 +89,15 @@ export function Explorer(props: Props) {
             const itemState = await getItemState(ToTokenIdU64(Number(values.itemID)));
 
             if (itemState.metadata_url.type === 'Some') {
-                const metadata = await getPinataData(itemState.metadata_url.content.url, pinata);
-                if (metadata && !(metadata instanceof Blob) && metadata.imageUrl) {
-                    setLoadingImageUrl(true);
-                    try {
-                        const imageData = await getPinataData(metadata.imageUrl as string, pinata);
-                        if (imageData instanceof Blob) {
-                            const blobUrl = URL.createObjectURL(imageData);
-                            setProductImageUrl(blobUrl);
-                        }
-                    } catch (error) {
-                        console.log('error to get image signed url')
-                    } finally {
-                        setLoadingImageUrl(false);
+                const productMetadataJson = await getDataFromIPFS(itemState.metadata_url.content.url, pinata);
+                if (productMetadataJson && productMetadataJson.contentType === 'application/json') {
+                    console.log(productMetadataJson.data);
+                    const productMetadata: {
+                        [key: string]: unknown;
+                        imageUrl?: string;
+                    } = JSON.parse(productMetadataJson.data as string)
+                    if (productMetadata.imageUrl) {
+                        setProductImageUrl(`https://ipfs.io/ipfs/${productMetadata.imageUrl}`)
                     }
                 }
             }

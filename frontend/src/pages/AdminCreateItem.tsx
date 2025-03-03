@@ -24,7 +24,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { InputImageFile } from '@/components/InputImageFile';
 import { LocationPicker } from '@/components/LocationPicker';
 import { LocationDetector } from '@/components/LocationDetector';
-import { PinataSDK } from 'pinata';
+import { PinataSDK } from 'pinata-web3';
 import { Loader2 } from 'lucide-react';
 import { useAlertMsg } from '@/hooks/use-alert-msg';
 
@@ -112,8 +112,8 @@ export function AdminCreateItem(props: Props) {
             setIsLoading(true);
 
             let metadata: Record<string, unknown> | undefined;
-            let imageCid: string | undefined;
-            let metadataCid: string | undefined;
+            let productImageCid: string | undefined;
+            let productMetadataJsonCid: string | undefined;
 
             if (values.url !== '') {
                 try {
@@ -127,15 +127,15 @@ export function AdminCreateItem(props: Props) {
 
             if (values.productImages.length > 0) {
                 try {
-                    imageCid = (await pinata.upload.file(values.productImages[0])).cid;
+                    productImageCid = (await pinata.upload.file(values.productImages[0])).IpfsHash;
                     if (metadata) {
                         metadata = {
                             ...metadata,
-                            imageUrl: `ipfs://${imageCid}`,
+                            imageUrl: `ipfs://${productImageCid}`,
                         };
                     } else {
                         metadata = {
-                            imageUrl: `ipfs://${imageCid}`,
+                            imageUrl: `ipfs://${productImageCid}`,
                         };
                     }
                 } catch (e) {
@@ -147,7 +147,7 @@ export function AdminCreateItem(props: Props) {
 
             if (metadata) {
                 try {
-                    metadataCid = (await pinata.upload.json(metadata)).cid;
+                    productMetadataJsonCid = (await pinata.upload.json(metadata)).IpfsHash;
                 } catch (e) {
                     setErrorMessage((e as Error).message);
                     setIsLoading(false);
@@ -159,11 +159,11 @@ export function AdminCreateItem(props: Props) {
                 additional_data: {
                     bytes: values.location !== '' ? objectToBytes({ location: values.location }) : [],
                 },
-                metadata_url: metadataCid
+                metadata_url: productMetadataJsonCid
                     ? {
                           type: 'Some',
                           content: {
-                              url: `ipfs://${metadataCid}`,
+                              url: `ipfs://${productMetadataJsonCid}`,
                               hash: { type: 'None' },
                           },
                       }

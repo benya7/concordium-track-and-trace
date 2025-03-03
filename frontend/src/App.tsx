@@ -11,7 +11,7 @@ import { ChangeItemStatus } from '@/pages/ChangeItemStatus';
 import { Explorer } from '@/pages/Explorer';
 import * as constants from '@/constants';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { PinataSDK } from 'pinata';
+import { PinataSDK } from 'pinata-web3';
 
 const pinata = new PinataSDK({
     pinataJwt: CONFIG.pinataJWT,
