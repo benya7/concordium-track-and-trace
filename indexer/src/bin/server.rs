@@ -242,7 +242,6 @@ async fn main() -> anyhow::Result<()> {
     let router = Router::new()
         .route("/api/getItemStatusChangedEvents", post(get_item_status_changed_events))
         .route("/api/getItemCreatedEvent", post(get_item_created_event))
-        .route("/api/getPinataData", post(get_pinata_data))
         .route("/health", get(health))
         .nest_service("/assets", serve_dir_service)
         .fallback(get(|| async { Html(index_html) }))
@@ -384,47 +383,4 @@ async fn get_item_created_event(
     Ok(Json(StoredItemCreatedEventReturnValue {
         data: database_result,
     }))
-}
-
-
-#[derive(serde::Deserialize)]
-struct PinataUrlRequest {
-    url: String,
-}
-
-
-async fn get_pinata_data(
-    Json(payload): Json<PinataUrlRequest>,
-) -> Result<Response, ServerError> {
-    let client = Client::new();
-    let response = client
-        .get(&payload.url)
-        .send()
-        .await
-        .map_err(|e| {
-            let msg = format!("Error fetching data from Pinata: {}", e);
-            tracing::error!("{}", msg);
-            ServerError::PinataError(msg)
-        })?;
-
-    let content_type = response
-        .headers()
-        .get(CONTENT_TYPE)
-        .and_then(|value| value.to_str().ok())
-        .unwrap_or("application/octet-stream")
-        .to_owned();
-
-    let bytes = response.bytes().await.map_err(|e| {
-        let msg = format!("Error reading bytes from Pinata response: {}", e);
-        tracing::error!("{}", msg);
-        ServerError::PinataError(msg)
-    })?;
-
-    let builder = Response::builder()
-        .status(StatusCode::OK)
-        .header(CONTENT_TYPE, content_type);
-
-    Ok(builder
-        .body(boxed(Full::from(bytes)))
-        .unwrap())
 }
