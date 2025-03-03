@@ -25,16 +25,15 @@ export const App = (props: WalletConnectionProps) => {
     const { connect } = useConnect(activeConnector, setConnection);
     const isMobile = useIsMobile();
     useEffect(() => {
-        setActiveConnectorType(constants.BROWSER_WALLET);
-    }, [setActiveConnectorType]);
-
+        if(!activeConnector) return;
+        connect?.()
+    }, [activeConnector, connect])
     return (
         <Router>
             <SidebarProvider>
                 <AppSidebar
-                    connect={connect}
+                    setActiveConnectorType={setActiveConnectorType}
                     disconnect={() => setConnection(undefined)}
-                    activeConnector={activeConnector}
                     account={account}
                 />
                 <main className="w-full">

@@ -12,8 +12,9 @@ import {
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { DAPP_NAME } from '@/constants';
-import { WalletConnector } from '@concordium/react-components';
+import { ConnectorType, WalletConnector } from '@concordium/react-components';
 import { useNavigate } from 'react-router-dom';
+import { WalletConnectorDialog } from './WalletConnectorDialog';
 
 const items = [
     {
@@ -44,12 +45,11 @@ const items = [
 ];
 
 interface Props {
-    connect: () => void;
     disconnect: () => void;
+    setActiveConnectorType: (type: ConnectorType | undefined) => void;
     account?: string;
-    activeConnector?: WalletConnector;
 }
-export function AppSidebar({ connect, disconnect, account, activeConnector }: Props) {
+export function AppSidebar({ disconnect, setActiveConnectorType, account }: Props) {
     const navigate = useNavigate();
     return (
         <Sidebar>
@@ -78,13 +78,7 @@ export function AppSidebar({ connect, disconnect, account, activeConnector }: Pr
                         <p>{account.slice(0, 5) + '...' + account.slice(-5)}</p>
                         <Button onClick={disconnect}>Disconnect</Button>
                     </div>
-                ) : activeConnector ? (
-                    <Button id="account" disabled={activeConnector && !account ? false : true} onClick={connect}>
-                        Connect Wallet
-                    </Button>
-                ) : (
-                    'Loading...'
-                )}
+                ) : <WalletConnectorDialog setActiveConnectorType={setActiveConnectorType} />}
             </SidebarFooter>
         </Sidebar>
     );
