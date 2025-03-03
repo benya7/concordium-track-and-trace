@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Alert } from '@/components/Alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ChangeItem, CreateItem, getItemCreatedEvent, getItemStatusChangedEvents } from '@/lib/itemEvents';
-import { bytesToObject, getDataFromIPFS, parseCoordinates, ToTokenIdU64 } from '@/lib/utils';
+import { bytesToObject, getDataFromIPFS, parseCoordinates, parseUrlOrCid, ToTokenIdU64 } from '@/lib/utils';
 import { MapContainer, TileLayer, CircleMarker, Popup, Polyline, Circle } from 'react-leaflet';
 import { LatLngExpression } from 'leaflet';
 import { PinataSDK } from 'pinata-web3';
@@ -96,7 +96,7 @@ export function Explorer(props: Props) {
                         imageUrl?: string;
                     }
                     if (imageUrl) {
-                        setProductImageUrl(`https://ipfs.io/ipfs/${imageUrl}`)
+                        setProductImageUrl(`https://ipfs.io/ipfs/${parseUrlOrCid(imageUrl)}`)
                     }
                 }
             }

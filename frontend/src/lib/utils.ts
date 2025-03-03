@@ -195,8 +195,11 @@ export function getExpiryTime(days: number): Date {
     return expiry;
 }
 
+export function parseUrlOrCid(urlOrCid: string): string {
+    return urlOrCid.startsWith('ipfs://') ? urlOrCid.split('//')[1] : urlOrCid;
+}
 /**
- * Fetches data from a IPFS URL or CID content.
+ * Fetches data from an IPFS URL or CID content.
  *
  * @param urlOrCid The IPFS URL or CID content.
  * @throws If the server responds with an error or the response is malformed.
@@ -207,7 +210,7 @@ export async function getDataFromIPFS(
     urlOrCid: string,
     pinata: PinataSDK,
 ) {
-    const cid = urlOrCid.startsWith('ipfs://') ? urlOrCid.split('//')[1] : urlOrCid;
+    const cid = parseUrlOrCid(urlOrCid);
     try {
         return await pinata.gateways.get(cid);
     } catch (error) {
