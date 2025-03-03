@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { WalletConnection } from '@concordium/wallet-connectors';
-import { AccountAddress } from '@concordium/web-sdk';
+import { AccountAddress, TransactionHash, TransactionKindString, TransactionSummaryType } from '@concordium/web-sdk';
 
 import { TxHashLink } from '@/components/TxHashLink';
 import { addRole, removeRole, getAddressesByRole } from '@/track_and_trace_contract';
@@ -15,7 +15,7 @@ import { Alert } from '@/components/Alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { ReturnValueGetAddressesByRole } from '../../generated/module_track_and_trace';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { LucideTrash } from 'lucide-react';
+import { Loader2, LucideTrash } from 'lucide-react';
 import {
     Dialog,
     DialogClose,
@@ -27,6 +27,8 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { useAlertMsg } from '@/hooks/use-alert-msg';
+import { useGrpcClient } from '@concordium/react-components';
+import { NETWORK } from '@/constants';
 
 interface Props {
     connection: WalletConnection | undefined;
@@ -47,11 +49,12 @@ export function AdminChangeRoles(props: Props) {
         },
     });
 
-    const {message: txHash, setMessage: setTxHash} = useAlertMsg(12000);
-    const {message: errorMessage, setMessage: setErrorMessage} = useAlertMsg();
+    const { message: txHash, setMessage: setTxHash } = useAlertMsg(12000);
+    const { message: errorMessage, setMessage: setErrorMessage } = useAlertMsg();
     const [currentAdmins, setCurrentAdmins] = useState<ReturnValueGetAddressesByRole | undefined>();
-
-    useEffect(() => {
+    const grpcClient = useGrpcClient(NETWORK);
+    const [isLoading, setIsLoading] = useState(false);
+    function refreshAdminsList() {
         const parameter: TrackAndTraceContract.GetAddressesByRoleParameter = {
             type: 'Admin',
         };
@@ -62,7 +65,35 @@ export function AdminChangeRoles(props: Props) {
             .catch((e) => {
                 setErrorMessage((e as Error).message);
             });
+    }
+
+    useEffect(() => {
+        refreshAdminsList()
     }, []);
+
+    useEffect(() => {
+        if (connection && grpcClient && txHash !== undefined) {
+            grpcClient
+                .waitForTransactionFinalization(TransactionHash.fromHexString(txHash))
+                .then((report) => {
+                    if (
+                        report.summary.type === TransactionSummaryType.AccountTransaction &&
+                        report.summary.transactionType === TransactionKindString.Update
+                    ) {
+                        refreshAdminsList()
+                    } else {
+                        setErrorMessage('Tansaction failed and event decoding failed.');
+                    }
+                })
+                .catch((e) => {
+                    setErrorMessage((e as Error).message);
+                })
+                .finally(() => {
+                    form.reset()
+                    setIsLoading(false);
+                })
+        }
+    }, [connection, grpcClient, txHash]);
 
     function handleRemoveRole(address: string) {
         const parameter: TrackAndTraceContract.RevokeRoleParameter = {
@@ -75,6 +106,7 @@ export function AdminChangeRoles(props: Props) {
             removeRole(connection, AccountAddress.fromBase58(accountAddress), parameter)
                 .then((txHash: string) => {
                     setTxHash(txHash);
+                    setIsLoading(true);
                 })
                 .catch((e) => {
                     setErrorMessage((e as Error).message);
@@ -104,6 +136,7 @@ export function AdminChangeRoles(props: Props) {
             addRole(connection, AccountAddress.fromBase58(accountAddress), parameter)
                 .then((txHash: string) => {
                     setTxHash(txHash);
+                    setIsLoading(true);
                 })
                 .catch((e) => {
                     setErrorMessage((e as Error).message);
@@ -141,8 +174,8 @@ export function AdminChangeRoles(props: Props) {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" className="min-w-24">
-                                Add
+                            <Button type="submit" className="min-w-24" disabled={isLoading}>
+                                {isLoading ? <Loader2 className="animate-spin" /> : 'Add'}
                             </Button>
                         </form>
                     </Form>
