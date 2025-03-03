@@ -2,7 +2,6 @@ import { useState } from 'react';
 import * as constants from '@/constants';
 import { Button } from '@/components/ui/button';
 import { LucideCopy, LucideCopyCheck } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TxHashLinkProps {
     txHash: string;
@@ -13,7 +12,6 @@ interface TxHashLinkProps {
  */
 export function TxHashLink({ txHash }: TxHashLinkProps) {
     const [isCopied, setIsCopied] = useState(false);
-    const isMobile = useIsMobile();
     const handleCopy = async () => {
         try {
             if (!navigator.clipboard) {
@@ -38,7 +36,7 @@ export function TxHashLink({ txHash }: TxHashLinkProps) {
     return (
         <div className="flex items-center">
             <a target="_blank" rel="noreferrer" href={`${constants.CCD_EXPLORER_URL}/transaction/${txHash}`}>
-                {isMobile ? `${txHash.slice(0, 5)}...${txHash.slice(-5)}` : txHash}
+                {`${txHash.slice(0, 4)}...${txHash.slice(-4)}`}
             </a>
             <Button onClick={handleCopy} variant="ghost" size="icon">
                 {isCopied ? <LucideCopyCheck className="text-green-500" /> : <LucideCopy />}
