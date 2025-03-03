@@ -275,6 +275,7 @@ export function ChangeItemStatus(props: Props) {
                                         <FormControl>
                                             <Input
                                                 type="number"
+                                                min={0}
                                                 placeholder="Enter the tracking number ID"
                                                 {...field}
                                             />
