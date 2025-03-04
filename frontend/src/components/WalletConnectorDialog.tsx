@@ -11,20 +11,20 @@ export function WalletConnectorDialog({setActiveConnectorType}: Props) {
   
   return (<Dialog>
     <DialogTrigger asChild>
-      <Button variant="outline">Connect</Button>
+      <Button>Connect</Button>
     </DialogTrigger>
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>Pick a wallet</DialogTitle>
       </DialogHeader>
-      <div className="grid gap-4 py-4">
-        <Button onClick={() => setActiveConnectorType(BROWSER_WALLET)}>
+      <div className="flex justify-center gap-4">
+        <Button variant="ghost" className="h-full max-w-20 flex-col" onClick={() => setActiveConnectorType(BROWSER_WALLET)} >
           <img src="/images/concordium-wallet-logo.png" alt="" />
-          Concordium Browser Wallet
+          <p className="text-wrap">Concordium Wallet</p>
         </Button>
-        <Button onClick={() => setActiveConnectorType(WALLETCONNECT_WALLET)}>
-          <img src="/images/connectwallet-logo.png" alt="" />
-          Wallet Connect
+        <Button variant="ghost"  className="h-full max-w-20 flex-col" onClick={() => setActiveConnectorType(WALLETCONNECT_WALLET)}>
+          <img  src="/images/walletconnect-logo.png" alt="" />
+          <p className="text-wrap">Wallet Connect</p>
         </Button>
       </div>
     </DialogContent>
