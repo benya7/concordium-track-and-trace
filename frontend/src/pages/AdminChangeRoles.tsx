@@ -123,7 +123,7 @@ export function AdminChangeRoles(props: Props) {
             throw Error(`'address' input field is undefined`);
         }
 
-        const parameter: TrackAndTraceContract.RevokeRoleParameter = {
+        const parameter: TrackAndTraceContract.GrantRoleParameter = {
             address: {
                 type: 'Account',
                 content: AccountAddress.fromBase58(values.address),
