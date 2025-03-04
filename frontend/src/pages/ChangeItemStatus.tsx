@@ -131,6 +131,7 @@ export function ChangeItemStatus(props: Props) {
             nonceOf(nonceOfParam)
                 .then((nonceValue: TrackAndTraceContract.ReturnValueNonceOf) => {
                     if (nonceValue !== undefined) {
+                        console.log("Fetched nonce:", nonceValue[0]);
                         setNextNonce(nonceValue[0]);
                     }
                 })
@@ -187,7 +188,7 @@ export function ChangeItemStatus(props: Props) {
                 value: Buffer.from(serializedMessage.buffer),
                 schema: typeSchemaFromBase64(constants.SERIALIZATION_HELPER_SCHEMA_PERMIT_MESSAGE),
             });
-
+            console.log("Submitting with nonce:", nextNonce);
             const txHash = await submitTransaction(
                 payload,
                 permitSignature,
@@ -236,7 +237,7 @@ export function ChangeItemStatus(props: Props) {
         nonce: number | bigint,
         signer: string,
     ): Promise<string> {
-        const response = await fetch(constants.SPONSORED_TRANSACTION_BACKEND + `api/submitTransaction`, {
+        const body = {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
             body: JSONbig.stringify({
@@ -249,7 +250,9 @@ export function ChangeItemStatus(props: Props) {
                 entrypointName: 'changeItemStatus',
                 parameter: Buffer.from(payload.buffer).toString('hex'),
             }),
-        });
+        }
+        console.log("Request body:", body);
+        const response = await fetch(constants.SPONSORED_TRANSACTION_BACKEND + `api/submitTransaction`, body);
 
         if (!response.ok) {
             const error = await response.json();
