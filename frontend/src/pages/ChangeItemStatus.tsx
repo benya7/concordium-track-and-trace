@@ -67,9 +67,9 @@ function generateMessage(
             },
             new_metadata_url: newMetadataUrl
                 ? {
-                      type: 'Some',
-                      content: { url: newMetadataUrl, hash: { type: 'None' } },
-                  }
+                    type: 'Some',
+                    content: { url: newMetadataUrl, hash: { type: 'None' } },
+                }
                 : { type: 'None' },
         };
 
@@ -114,8 +114,8 @@ export function ChangeItemStatus(props: Props) {
     });
 
     const [isLoading, setIsLoading] = useState(false);
-    const {message: txHash, setMessage: setTxHash} = useAlertMsg(12000);
-    const {message: errorMessage, setMessage: setErrorMessage} = useAlertMsg();
+    const { message: txHash, setMessage: setTxHash } = useAlertMsg(12000);
+    const { message: errorMessage, setMessage: setErrorMessage } = useAlertMsg();
 
     const [nextNonce, setNextNonce] = useState<number | bigint>(0);
 
@@ -207,27 +207,50 @@ export function ChangeItemStatus(props: Props) {
     }
 
     async function handleMetadata(values: FormType): Promise<string | undefined> {
-        if (!values.newMetadataUrl) return undefined;
+        if (!values.newMetadataUrl && values.productImages.length === 0) {
+            return undefined;
+        }
 
-        let newMetadata = await fetchJson(values.newMetadataUrl);
-        // Check if exists metadata from the item state, if exists merge the objects.
+        let newMetadata = values.newMetadataUrl
+            ? await fetchJson(values.newMetadataUrl)
+            : {};
+
         const itemState = await getItemState(ToTokenIdU64(Number(values.itemID)));
         if (itemState.metadata_url.type === "Some") {
             const productMetadataJson = await getDataFromIPFS(itemState.metadata_url.content.url, pinata);
+
             if (productMetadataJson && productMetadataJson.contentType === 'application/json') {
                 const productMetadata = productMetadataJson.data as unknown as {
                     [key: string]: unknown;
+                    imageUrl?: string;
                 };
-                newMetadata = { ...productMetadata, ...newMetadata };
+                newMetadata = structuredClone({
+                    ...productMetadata,
+                    ...newMetadata,
+                });
             }
         }
+
         if (values.productImages.length > 0) {
-            const productImageCid = (await pinata.upload.file(values.productImages[0])).IpfsHash;
-            newMetadata = { ...newMetadata, imageUrl: `ipfs://${productImageCid}` };
+            try {
+                const productImageCid = (await pinata.upload.file(values.productImages[0])).IpfsHash;
+                newMetadata = structuredClone({
+                    ...newMetadata,
+                    imageUrl: `ipfs://${productImageCid}`,
+                });
+            } catch (error) {
+                console.error('Failed to upload product image:', error);
+                throw new Error('Image upload failed');
+            }
         }
 
-        const productMetadataJsonCid = (await pinata.upload.json(newMetadata)).IpfsHash;
-        return `ipfs://${productMetadataJsonCid}`;
+        try {
+            const productMetadataJsonCid = (await pinata.upload.json(newMetadata)).IpfsHash;
+            return `ipfs://${productMetadataJsonCid}`;
+        } catch (error) {
+            console.error('Failed to upload metadata JSON:', error);
+            throw new Error('Metadata upload failed');
+        }
     }
 
     async function submitTransaction(
