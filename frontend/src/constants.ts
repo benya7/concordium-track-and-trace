@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { BrowserWalletConnector, WalletConnectConnector, ephemeralConnectorType} from '@concordium/react-components';
 import { ContractAddress } from '@concordium/web-sdk';
-import { TESTNET, MAINNET } from '@concordium/wallet-connectors';
+import { TESTNET, MAINNET, CONCORDIUM_WALLET_CONNECT_PROJECT_ID } from '@concordium/wallet-connectors';
 import { SignClientTypes } from '@walletconnect/types';
 
 const { protocol, hostname, port } = new URL(CONFIG.node);
@@ -28,15 +28,15 @@ export const CCD_EXPLORER_URL =
 // the transaction to cover small variations (e.g. changes to the smart contract
 // state) caused by transactions that have been executed meanwhile.
 export const EPSILON_ENERGY = 200n;
-const WALLET_CONNECT_PROJECT_ID = 'de4ecb78ceec18da50bb03f50de352b5';
+// const WALLET_CONNECT_PROJECT_ID = 'de4ecb78ceec18da50bb03f50de352b5';
 const WALLET_CONNECT_OPTS: SignClientTypes.Options = {
-    projectId: WALLET_CONNECT_PROJECT_ID,
-    metadata: {
-        name: 'Track and Trace V2',
-        description: 'Track and trace products securely on Concordium blockchain',
-        url: '#',
-        icons: ['https://walletconnect.com/walletconnect-logo.png'],
-    },
+    projectId: CONCORDIUM_WALLET_CONNECT_PROJECT_ID,
+    // metadata: {
+    //     name: 'Track and Trace V2',
+    //     description: 'Track and trace products securely on Concordium blockchain',
+    //     url: '#',
+    //     icons: ['https://walletconnect.com/walletconnect-logo.png'],
+    // },
 };
 export const BROWSER_WALLET = ephemeralConnectorType(BrowserWalletConnector.create);
 export const WALLETCONNECT_WALLET = ephemeralConnectorType(WalletConnectConnector.create.bind(this, WALLET_CONNECT_OPTS));
