@@ -182,7 +182,7 @@ export function AddTransitionRule(props: Props) {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" className="min-w-24">
+                            <Button type="submit" className="w-20">
                                 Submit
                             </Button>
                         </form>

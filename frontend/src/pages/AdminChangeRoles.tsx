@@ -174,7 +174,7 @@ export function AdminChangeRoles(props: Props) {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" className="min-w-24" disabled={isLoading}>
+                            <Button type="submit" className="w-20" disabled={isLoading}>
                                 {isLoading ? <Loader2 className="animate-spin" /> : 'Add'}
                             </Button>
                         </form>

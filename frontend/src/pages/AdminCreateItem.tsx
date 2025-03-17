@@ -228,7 +228,7 @@ export function AdminCreateItem(props: Props) {
                                 )}
                             />
                             <InputImageFile onChange={(imageFiles) => form.setValue('productImages', imageFiles)} />
-                            <Button type="submit" className="min-w-24" disabled={isLoading}>
+                            <Button type="submit" className="w-20" disabled={isLoading}>
                                 {isLoading ? <Loader2 className="animate-spin" /> : 'Create'}
                             </Button>
                         </form>

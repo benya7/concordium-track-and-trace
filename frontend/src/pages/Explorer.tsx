@@ -133,7 +133,7 @@ export function Explorer(props: Props) {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" className="min-w-24">
+                            <Button type="submit" className="w-20">
                                 Search
                             </Button>
                         </form>

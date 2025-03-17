@@ -125,6 +125,7 @@ export function ChangeItemStatus(props: Props) {
     const [isEditing, setIsEditing] = useState(false);
     const [itemChanged, setItemChanged] = useState<ChangeItem[] | undefined>(undefined);
     const [itemCreated, setItemCreated] = useState<CreateItem | undefined>(undefined);
+    const [productStatus, setProductStatus] = useState<ItemStatus | undefined>(undefined);
     const [productImageUrl, setProductImageUrl] = useState<string | undefined>(undefined);
     const [productMetadata, setProductMetadata] = useState<Record<string, unknown> | undefined>(undefined);
 
@@ -201,9 +202,12 @@ export function ChangeItemStatus(props: Props) {
     }, [itemChanged, itemCreated]);
 
     useEffect(() => {
+        setIsEditing(false)
         setProductImageUrl(undefined);
         setItemChanged(undefined);
         setItemCreated(undefined);
+        form.setValue('newStatus', 'Produced')
+        setProductStatus('Produced')
     }, [itemIDWatch])
 
     async function onSearch() {
@@ -221,6 +225,7 @@ export function ChangeItemStatus(props: Props) {
 
             const itemState = await getItemState(ToTokenIdU64(Number(itemIDWatch)));
             form.setValue('newStatus', itemState.status.type)
+            setProductStatus(itemState.status.type)
             if (itemState.metadata_url.type === 'Some') {
                 const productJsonMetadata = await getDataFromIPFS(itemState.metadata_url.content.url, pinata);
                 if (productJsonMetadata && productJsonMetadata.contentType === 'application/json') {
@@ -364,13 +369,13 @@ export function ChangeItemStatus(props: Props) {
 
     return (
         <div className="h-full w-full flex flex-col items-center py-16 px-2">
-            <Card className="w-full sm:max-w-md min-h-60">
+            <Card className="w-full sm:max-w-md mb-4">
                 <CardHeader>
                     <CardTitle>Update The Product Status</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onUpdateItem)} className="space-y-8">
+                        <form onSubmit={form.handleSubmit(onUpdateItem)} className="space-y-6">
                             <FormField
                                 control={form.control}
                                 name="itemID"
@@ -390,8 +395,9 @@ export function ChangeItemStatus(props: Props) {
                                     </FormItem>
                                 )}
                             />
-                            {isEditing ? (
+                            <Button onClick={onSearch} className="w-20" type='button'>Search</Button>
 
+                            {isEditing && (
                                 <>
                                     <FormField
                                         control={form.control}
@@ -451,71 +457,14 @@ export function ChangeItemStatus(props: Props) {
                                         )}
                                     />
                                     <InputImageFile onChange={(imageFiles) => form.setValue('productImages', imageFiles)} />
-                                    <Button onClick={() => setIsEditing(false)} className="min-w-24" type='button'>Cancel</Button>
-                                    <Button type="submit" className="min-w-24" disabled={isLoading}>
+                                    <Button onClick={() => setIsEditing(false)} className="w-20 mr-2" type='button'>Cancel</Button>
+                                    <Button type="submit" className="w-20" disabled={isLoading}>
                                         {isLoading ? <Loader2 className="animate-spin" /> : 'Save'}
                                     </Button>
                                 </>
-                            ) : (
-                                <div>
-                                    <Button onClick={onSearch} className="min-w-24" type='button'>Search</Button>
-                                    {itemChanged !== undefined && itemCreated !== undefined && (
-                                        <div className="grid md:grid-cols-2 gap-1 w-full max-w-2xl p-2 border rounded-lg">
-                                            <div className="relative border rounded-lg">
-                                                {productImageUrl ? (
-                                                    <img
-                                                        src={productImageUrl}
-                                                        alt="product-image"
-                                                        className="h-60 mx-auto"
-                                                        crossOrigin="anonymous"
-                                                    />
-                                                ) : (
-                                                    <div className="h-full flex items-center justify-center min-h-60">
-                                                        {loadingImageUrl ? <Spinner show={loadingImageUrl} /> : <p className="text-[0.8rem] text-muted-foreground">No product images avalaible.</p>}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="relative border rounded-lg">
-                                                {tracePath && tracePath.length > 0 ? (
-                                                    <MapContainer center={tracePath.at(-1)!} zoom={8} className="h-60">
-                                                        <TileLayer
-                                                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                                        />
-                                                        <Circle center={tracePath.at(0)!} pathOptions={{ fillColor: 'green' }} radius={20} />
-                                                        <CircleMarker center={tracePath.at(0)!} pathOptions={{ color: 'green' }} radius={20}>
-                                                            <Popup>Origin</Popup>
-                                                        </CircleMarker>
-                                                        <Circle center={tracePath.at(-1)!} pathOptions={{ fillColor: 'red' }} radius={20} />
-                                                        <CircleMarker center={tracePath.at(-1)!} pathOptions={{ color: 'red' }} radius={20}>
-                                                            <Popup>Current</Popup>
-                                                        </CircleMarker>
-                                                        <Polyline pathOptions={{ color: 'blue' }} positions={tracePath} />
-                                                    </MapContainer>
-                                                ) : (
-                                                    <div className="h-full flex items-center justify-center">
-                                                        <p className="text-[0.8rem] text-muted-foreground">No tracking locations avalaible.</p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="md:col-span-2 border-t mt-2">
-                                                {productMetadata ? (<JsonView data={productMetadata as object} shouldExpandNode={allExpanded} style={defaultStyles} />) : (<div className="h-full flex items-center justify-center">
-                                                    <p className="text-[0.8rem] text-muted-foreground">No product metadata avalaible.</p>
-                                                </div>)}
-
-                                            </div>
-                                            <Button onClick={() => {
-                                                setIsEditing(true)
-
-                                            }} className="min-w-24" type='button'>Edit</Button>
-                                        </div>
-                                        
-                                    )}
-                                </div>
                             )}
                         </form>
                     </Form>
-
                 </CardContent>
             </Card>
             <div className="fixed bottom-4">
@@ -534,6 +483,58 @@ export function ChangeItemStatus(props: Props) {
                 )}
                 {txHash && <Alert title="Transaction Hash" description={<TxHashLink txHash={txHash} />} />}
             </div>
+            {!isEditing && itemChanged !== undefined && itemCreated !== undefined && (
+                <div className="grid md:grid-cols-2 gap-1 w-full max-w-2xl p-2 border rounded-lg">
+                    <div className="relative border rounded-lg">
+                        {productImageUrl ? (
+                            <img
+                                src={productImageUrl}
+                                alt="product-image"
+                                className="h-60 mx-auto"
+                                crossOrigin="anonymous"
+                            />
+                        ) : (
+                            <div className="h-full flex items-center justify-center min-h-60">
+                                {loadingImageUrl ? <Spinner show={loadingImageUrl} /> : <p className="text-[0.8rem] text-muted-foreground">No product images avalaible.</p>}
+                            </div>
+                        )}
+                    </div>
+                    <div className="relative border rounded-lg">
+                        {tracePath && tracePath.length > 0 ? (
+                            <MapContainer center={tracePath.at(-1)!} zoom={8} className="h-60">
+                                <TileLayer
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                />
+                                <Circle center={tracePath.at(0)!} pathOptions={{ fillColor: 'green' }} radius={20} />
+                                <CircleMarker center={tracePath.at(0)!} pathOptions={{ color: 'green' }} radius={20}>
+                                    <Popup>Origin</Popup>
+                                </CircleMarker>
+                                <Circle center={tracePath.at(-1)!} pathOptions={{ fillColor: 'red' }} radius={20} />
+                                <CircleMarker center={tracePath.at(-1)!} pathOptions={{ color: 'red' }} radius={20}>
+                                    <Popup>Current</Popup>
+                                </CircleMarker>
+                                <Polyline pathOptions={{ color: 'blue' }} positions={tracePath} />
+                            </MapContainer>
+                        ) : (
+                            <div className="h-full flex items-center justify-center">
+                                <p className="text-[0.8rem] text-muted-foreground">No tracking locations avalaible.</p>
+                            </div>
+                        )}
+                    </div>
+                    <div className="md:col-span-2 border-t mt-2 min-h-24 max-w-full overflow-x-auto">
+                        <p className='my-2'>Status: {productStatus}</p>
+                        {productMetadata ? (<JsonView data={productMetadata as object} shouldExpandNode={allExpanded} style={{ ...defaultStyles, container: `${defaultStyles.container} py-2` }} />) : (<div className="h-full flex items-center justify-center">
+                            <p className="text-[0.8rem] text-muted-foreground">No product metadata avalaible.</p>
+                        </div>)}
+
+                    </div>
+                    <Button onClick={() => {
+                        setIsEditing(true)
+                    }} className="w-20 mt-2" type='button'>Edit</Button>
+                </div>
+
+            )}
         </div>
     );
 }
