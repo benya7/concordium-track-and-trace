@@ -376,28 +376,29 @@ export function ChangeItemStatus(props: Props) {
                 <CardContent>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onUpdateItem)} className="space-y-6">
-                            <FormField
-                                control={form.control}
-                                name="itemID"
-                                rules={{ required: 'Item ID is required' }}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Item ID</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                min={0}
-                                                placeholder="Enter the tracking number ID"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <Button onClick={onSearch} className="w-20" type='button'>Search</Button>
+                            {!isEditing ? (
+                                <><FormField
+                                    control={form.control}
+                                    name="itemID"
+                                    rules={{ required: 'Item ID is required' }}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Item ID</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    min={0}
+                                                    placeholder="Enter the tracking number ID"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                    <Button onClick={onSearch} className="w-20" type='button'>Search</Button>
 
-                            {isEditing && (
+                                </>) : (
                                 <>
                                     <FormField
                                         control={form.control}
