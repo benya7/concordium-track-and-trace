@@ -40,6 +40,7 @@
         "react-dom": "^18.3.1",
         "react-dropzone": "^14.3.5",
         "react-hook-form": "^7.53.2",
+        "react-json-view-lite": "^2.4.1",
         "react-leaflet": "^4.2.1",
         "react-router-dom": "^6.28.0",
         "rollup-plugin-node-polyfills": "^0.2.1",
