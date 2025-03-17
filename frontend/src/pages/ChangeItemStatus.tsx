@@ -526,9 +526,16 @@ export function ChangeItemStatus(props: Props) {
                     </div>
                     <div className="md:col-span-2 border-t mt-2 min-h-24 max-w-full overflow-x-auto">
                         <p className='my-2'>Status: {productStatus}</p>
-                        {productMetadata ? (<JsonView data={productMetadata as object} shouldExpandNode={allExpanded} style={{ ...defaultStyles, container: `${defaultStyles.container} py-2` }} />) : (<div className="h-full flex items-center justify-center">
-                            <p className="text-[0.8rem] text-muted-foreground">No product metadata avalaible.</p>
-                        </div>)}
+                        {productMetadata ? (
+                            <>
+                                <p className='mb-1'>Metadata:</p>
+                                <JsonView data={productMetadata as object} shouldExpandNode={allExpanded} style={{ ...defaultStyles, container: `${defaultStyles.container} py-2` }} />
+                            </>
+                        ) : (
+                            <div className="h-full flex items-center justify-center">
+                                <p className="text-[0.8rem] text-muted-foreground">No product metadata avalaible.</p>
+                            </div>
+                        )}
 
                     </div>
                     <Button onClick={() => {
