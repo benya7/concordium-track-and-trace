@@ -202,10 +202,11 @@ export function ChangeItemStatus(props: Props) {
     }, [itemChanged, itemCreated]);
 
     useEffect(() => {
-        setProductImageUrl(undefined);
         setItemChanged(undefined);
         setItemCreated(undefined);
-        setProductStatus(undefined)
+        setProductStatus(undefined);
+        setProductMetadata(undefined);
+        setProductImageUrl(undefined);
     }, [itemIDWatch])
 
     async function onSearch() {
@@ -224,6 +225,7 @@ export function ChangeItemStatus(props: Props) {
             const itemState = await getItemState(ToTokenIdU64(Number(itemIDWatch)));
             setProductStatus(itemState.status.type)
             if (itemState.metadata_url.type === 'Some') {
+                setLoadingImageUrl(true)
                 const productJsonMetadata = await getDataFromIPFS(itemState.metadata_url.content.url, pinata);
                 if (productJsonMetadata && productJsonMetadata.contentType === 'application/json') {
                     setProductMetadata(productJsonMetadata.data as unknown as Record<string, unknown>)
@@ -238,6 +240,8 @@ export function ChangeItemStatus(props: Props) {
             }
         } catch (error) {
             setErrorMessage(`Couldn't get data from database. Orginal error: ${(error as Error).message}`);
+        } finally {
+            setLoadingImageUrl(false)
         }
     }
     async function onUpdateItem(values: FormType) {

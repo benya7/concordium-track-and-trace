@@ -89,6 +89,7 @@ export function Explorer(props: Props) {
             const itemState = await getItemState(ToTokenIdU64(Number(values.itemID)));
 
             if (itemState.metadata_url.type === 'Some') {
+                setLoadingImageUrl(true)
                 const productMetadataJson = await getDataFromIPFS(itemState.metadata_url.content.url, pinata);
                 if (productMetadataJson && productMetadataJson.contentType === 'application/json') {
                     const { imageUrl } = productMetadataJson.data as unknown as {
@@ -102,6 +103,8 @@ export function Explorer(props: Props) {
             }
         } catch (error) {
             setMessage(`Couldn't get data from database. Orginal error: ${(error as Error).message}`);
+        } finally {
+            setLoadingImageUrl(false)
         }
     }
 
