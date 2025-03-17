@@ -202,14 +202,11 @@ export function ChangeItemStatus(props: Props) {
     }, [itemChanged, itemCreated]);
 
     useEffect(() => {
-        if (!isEditing) {
-            setProductImageUrl(undefined);
-            setItemChanged(undefined);
-            setItemCreated(undefined);
-            form.setValue('newStatus', 'Produced');
-            setProductStatus('Produced');
-        }
-    }, [itemIDWatch, isEditing])
+        setProductImageUrl(undefined);
+        setItemChanged(undefined);
+        setItemCreated(undefined);
+        setProductStatus(undefined)
+    }, [itemIDWatch])
 
     async function onSearch() {
         setErrorMessage(undefined);
@@ -225,7 +222,6 @@ export function ChangeItemStatus(props: Props) {
             await getItemStatusChangedEvents(Number(itemIDWatch), setItemChanged);
 
             const itemState = await getItemState(ToTokenIdU64(Number(itemIDWatch)));
-            form.setValue('newStatus', itemState.status.type)
             setProductStatus(itemState.status.type)
             if (itemState.metadata_url.type === 'Some') {
                 const productJsonMetadata = await getDataFromIPFS(itemState.metadata_url.content.url, pinata);
@@ -534,6 +530,10 @@ export function ChangeItemStatus(props: Props) {
                     </div>
                     <Button onClick={() => {
                         setIsEditing(true)
+                        form.setValue('newLocation', '')
+                        if (productStatus) {
+                            form.setValue('newStatus', productStatus)
+                        }
                     }} className="w-20 mt-2" type='button'>Edit</Button>
                 </div>
 
