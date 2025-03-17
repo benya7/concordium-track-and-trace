@@ -202,13 +202,14 @@ export function ChangeItemStatus(props: Props) {
     }, [itemChanged, itemCreated]);
 
     useEffect(() => {
-        setIsEditing(false)
-        setProductImageUrl(undefined);
-        setItemChanged(undefined);
-        setItemCreated(undefined);
-        form.setValue('newStatus', 'Produced')
-        setProductStatus('Produced')
-    }, [itemIDWatch])
+        if (!isEditing) {
+            setProductImageUrl(undefined);
+            setItemChanged(undefined);
+            setItemCreated(undefined);
+            form.setValue('newStatus', 'Produced');
+            setProductStatus('Produced');
+        }
+    }, [itemIDWatch, isEditing])
 
     async function onSearch() {
         setErrorMessage(undefined);
@@ -377,25 +378,26 @@ export function ChangeItemStatus(props: Props) {
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onUpdateItem)} className="space-y-6">
                             {!isEditing ? (
-                                <><FormField
-                                    control={form.control}
-                                    name="itemID"
-                                    rules={{ required: 'Item ID is required' }}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Item ID</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    min={0}
-                                                    placeholder="Enter the tracking number ID"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <>
+                                    <FormField
+                                        control={form.control}
+                                        name="itemID"
+                                        rules={{ required: 'Item ID is required' }}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Item ID</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        min={0}
+                                                        placeholder="Enter the tracking number ID"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                     <Button onClick={onSearch} className="w-20" type='button'>Search</Button>
 
                                 </>) : (
