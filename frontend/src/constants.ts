@@ -1,9 +1,11 @@
 import moment from 'moment';
-import { BrowserWalletConnector, ephemeralConnectorType } from '@concordium/react-components';
+import { BrowserWalletConnector, WalletConnectConnector, ephemeralConnectorType} from '@concordium/react-components';
 import { ContractAddress } from '@concordium/web-sdk';
-import { TESTNET, MAINNET } from '@concordium/wallet-connectors';
+import { TESTNET, MAINNET, CONCORDIUM_WALLET_CONNECT_PROJECT_ID } from '@concordium/wallet-connectors';
+import { SignClientTypes } from '@walletconnect/types';
 
 const { protocol, hostname, port } = new URL(CONFIG.node);
+
 export const NODE_HOST = `${protocol}//${hostname}`;
 export const NODE_PORT = Number(port);
 
@@ -17,7 +19,8 @@ export const CONTRACT_ADDRESS = ContractAddress.fromSerializable(CONFIG.contract
 /** The Concordium network used for the application. */
 export const NETWORK = CONFIG.network === 'mainnet' ? MAINNET : TESTNET;
 
-export const CCD_SCAN_URL = NETWORK === MAINNET ? 'https://ccdscan.io' : 'https://testnet.ccdscan.io';
+export const CCD_EXPLORER_URL =
+    NETWORK === MAINNET ? 'https://ccdexplorer.io/mainnet' : 'https://ccdexplorer.io/testnet';
 
 // Before submitting a transaction we simulate/dry-run the transaction to get an
 // estimate of the energy needed for executing the transaction. In addition, we
@@ -26,7 +29,20 @@ export const CCD_SCAN_URL = NETWORK === MAINNET ? 'https://ccdscan.io' : 'https:
 // state) caused by transactions that have been executed meanwhile.
 export const EPSILON_ENERGY = 200n;
 
+const WALLET_CONNECT_OPTS: SignClientTypes.Options = {
+    projectId: CONCORDIUM_WALLET_CONNECT_PROJECT_ID,
+    metadata: {
+        name: 'Track and Trace V2',
+        description: 'Track and trace products securely on Concordium blockchain',
+        url: '#',
+        icons: ['https://walletconnect.com/walletconnect-logo.png'],
+    },
+};
 export const BROWSER_WALLET = ephemeralConnectorType(BrowserWalletConnector.create);
+export const WALLETCONNECT_WALLET = ephemeralConnectorType(WalletConnectConnector.create.bind(this, WALLET_CONNECT_OPTS));
+
 
 export const SERIALIZATION_HELPER_SCHEMA_PERMIT_MESSAGE =
     'FAAFAAAAEAAAAGNvbnRyYWN0X2FkZHJlc3MMBQAAAG5vbmNlBQkAAAB0aW1lc3RhbXANCwAAAGVudHJ5X3BvaW50FgEHAAAAcGF5bG9hZBABAg==';
+
+export const DAPP_NAME = 'Track & Trace';

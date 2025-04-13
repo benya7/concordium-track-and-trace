@@ -223,7 +223,7 @@ pub async fn handle_transaction(
     request: Result<Json<InputParams>, JsonRejection>,
 ) -> Result<Json<TransactionHash>, ServerError> {
     let Json(request) = request?;
-
+    tracing::debug!("Received nonce: {}", request.nonce);
     if !state.allowed_accounts.allowed(&request.signer) {
         return Err(ServerError::AccountNotAllowed {
             account: request.signer,

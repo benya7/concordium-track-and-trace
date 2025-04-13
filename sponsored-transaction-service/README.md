@@ -52,7 +52,7 @@ correctly in the service (e.g. don't use the `3PXwJYYPf6fyVb4GJquxSZU8puxrHfzc4X
 
 The service is a simple server that exposes one endpoint
 
- - `POST /api/submitTransaction`
+- `POST /api/submitTransaction`
 
 The overall flow is that the user signs a sponsored message in the browser wallet (or mobile wallet via walletConnect) and sends the signature together with some input parameters to this service via the above endpoint.
 The service creates a sponsored transaction and submits it to the `permit` function in the provided smart contract.
@@ -86,6 +86,7 @@ The `parameter` is the serialized parameter to the `entrypoint_name` in hex enco
 
 This repository's CI automatically checks formatting and common problems in rust.
 Changes to any of the packages must be such that
+
 - `cargo clippy --all` produces no warnings
 - `rust fmt` makes no changes.
 
@@ -116,3 +117,29 @@ cargo build --release --locked
 
 This produces a single binary `target/release/sponsored-transaction-service`.
 
+## Transaction Flow
+
+The following diagram shows how a user interacts with the service to submit a sponsored transaction:
+
+```mermaid
+sequenceDiagram
+    participant U as User (Wallet)
+    participant S as Sponsored Transaction Service
+    participant N as Blockchain Node
+    participant C as Smart Contract
+
+    Note over U: User configures wallet and signs a sponsored message
+    U->>S: POST /api/submitTransaction<br>{signer, nonce, signature, expiryTime,<br>contractAddress, contractName,<br>entrypointName, parameter}
+    Note over S: Service validates:<br>- Allowed accounts<br>- Allowed contracts<br>- Rate limit
+    alt Validation Succeeds
+        S->>S: Create sponsored transaction<br>using sponsor account private key
+        S->>N: Submit transaction to 'permit' function<br>(sponsor account pays fees)
+        N->>C: Execute update (e.g., updateOperator)
+        C-->>N: Transaction processed
+        N-->>S: Return transaction hash
+        S-->>U: Return transaction hash
+    else Validation Fails
+        S-->>U: Return error (e.g., unauthorized account)
+    end
+    Note over S,N: Service requires:<br>- Access to node (e.g., grpc.testnet)<br>- Funded sponsor account
+```

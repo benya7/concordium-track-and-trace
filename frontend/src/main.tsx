@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom/client';
 
 import { WithWalletConnector } from '@concordium/react-components';
 
-import './styles.scss';
+import './index.css';
+import 'react-json-view-lite/dist/index.css';
 import * as constants from './constants';
 import { App } from './App';
 

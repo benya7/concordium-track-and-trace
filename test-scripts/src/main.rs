@@ -6,7 +6,7 @@ use concordium_rust_sdk::{
     types::{smart_contracts::WasmModule, WalletAccount},
     v2::{self as sdk, BlockIdentifier},
 };
-use track_and_trace::{MetadataUrl, *};
+use track_and_trace::*;
 
 pub enum TrackAndTraceContract {}
 
@@ -135,10 +135,13 @@ async fn main() -> anyhow::Result<()> {
 
     // Create new items
     for i in 0..args.num_items {
-        let param: Option<MetadataUrl> = None;
+        let param: CreateItemParams<AdditionalData> = CreateItemParams {
+            metadata_url: None,
+            additional_data: AdditionalData { bytes: vec![] }
+        };
 
         let tx_dry_run = contract_client
-            .dry_run_update::<Option<MetadataUrl>, ViewError>(
+            .dry_run_update::<CreateItemParams<AdditionalData>, ViewError>(
                 "createItem",
                 Amount::zero(),
                 admin_key.address,
@@ -159,6 +162,7 @@ async fn main() -> anyhow::Result<()> {
     for i in 0..args.num_items {
         let param: ChangeItemStatusParams<AdditionalData> = ChangeItemStatusParams {
             item_id:         ItemID::from(i),
+            new_metadata_url: None,
             new_status:      Status::InTransit,
             additional_data: AdditionalData::empty(),
         };
@@ -187,6 +191,7 @@ async fn main() -> anyhow::Result<()> {
     for i in 0..args.num_items {
         let param: ChangeItemStatusParams<AdditionalData> = ChangeItemStatusParams {
             item_id:         ItemID::from(i),
+            new_metadata_url: None,
             new_status:      Status::InStore,
             additional_data: AdditionalData::empty(),
         };
@@ -216,6 +221,7 @@ async fn main() -> anyhow::Result<()> {
     for i in 0..args.num_items {
         let param: ChangeItemStatusParams<AdditionalData> = ChangeItemStatusParams {
             item_id:         ItemID::from(i),
+            new_metadata_url: None,
             new_status:      Status::Sold,
             additional_data: AdditionalData::empty(),
         };
